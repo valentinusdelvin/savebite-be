@@ -22,3 +22,7 @@ go.work
 
 # config
 .env
+
+# IDEs and editors
+.vscode/
+.idea/
