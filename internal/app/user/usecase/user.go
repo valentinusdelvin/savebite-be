@@ -3,6 +3,7 @@ package usecase
 import (
 	"strings"
 
+	"github.com/google/uuid"
 	"github.com/valentinusdelvin/savebite-be/internal/app/user/repository"
 	"github.com/valentinusdelvin/savebite-be/internal/domain/dto"
 	"github.com/valentinusdelvin/savebite-be/internal/domain/entity"
@@ -11,6 +12,8 @@ import (
 )
 
 type UserUsecaseItf interface {
+	Register(register dto.Register) error
+	Login(login dto.Login) (string, error)
 }
 
 type userUsecase struct {
@@ -32,6 +35,7 @@ func (u *userUsecase) Register(register dto.Register) error {
 	}
 
 	user := entity.User{
+		UserId:    uuid.New(),
 		FirstName: register.FirstName,
 		LastName:  register.LastName,
 		Email:     register.Email,

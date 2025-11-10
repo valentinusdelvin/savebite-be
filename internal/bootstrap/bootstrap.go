@@ -5,9 +5,12 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/valentinusdelvin/savebite-be/internal/app/product/handler"
+	productHandler "github.com/valentinusdelvin/savebite-be/internal/app/product/handler"
 	productrepository "github.com/valentinusdelvin/savebite-be/internal/app/product/repository"
 	productusecase "github.com/valentinusdelvin/savebite-be/internal/app/product/usecase"
+	userHandler "github.com/valentinusdelvin/savebite-be/internal/app/user/handler"
+	userRepository "github.com/valentinusdelvin/savebite-be/internal/app/user/repository"
+	userUsecase "github.com/valentinusdelvin/savebite-be/internal/app/user/usecase"
 	"github.com/valentinusdelvin/savebite-be/internal/infra/config"
 	"github.com/valentinusdelvin/savebite-be/internal/infra/mysql"
 	"github.com/valentinusdelvin/savebite-be/internal/middleware"
@@ -40,10 +43,17 @@ func Start() error {
 	v1 := r.Group("/api/v1")
 
 	jwtItf := jwt.NewJWT(cfg.JWT_SECRET, cfg.JWT_EXPIRES)
+
+	userRepo := userRepository.NewUserRepository(database)
+	userUsecase := userUsecase.NewUserUsecase(userRepo, jwtItf)
+	userHandler.NewUserHandler(v1, userUsecase)
+
 	v1.Use(middleware.NewMiddleware(jwtItf).Authentication)
+
 	productRepo := productrepository.NewProductRepository(database)
 	productUsecase := productusecase.NewProductUsecase(productRepo)
-	handler.NewProductHandler(v1, productUsecase)
+	productHandler.NewProductHandler(v1, productUsecase)
+
 	v1.GET("/ping", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{
 			"message": "pong",
