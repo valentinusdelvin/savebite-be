@@ -1,10 +1,14 @@
 package bootstrap
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	aiHandler "github.com/valentinusdelvin/savebite-be/internal/app/ai/handler"
+	aiService "github.com/valentinusdelvin/savebite-be/internal/app/ai/service"
+	aiUsecase "github.com/valentinusdelvin/savebite-be/internal/app/ai/usecase"
 	productHandler "github.com/valentinusdelvin/savebite-be/internal/app/product/handler"
 	productrepository "github.com/valentinusdelvin/savebite-be/internal/app/product/repository"
 	productusecase "github.com/valentinusdelvin/savebite-be/internal/app/product/usecase"
@@ -15,9 +19,11 @@ import (
 	"github.com/valentinusdelvin/savebite-be/internal/infra/mysql"
 	"github.com/valentinusdelvin/savebite-be/internal/middleware"
 	"github.com/valentinusdelvin/savebite-be/internal/pkg/jwt"
+	"google.golang.org/genai"
 )
 
 func Start() error {
+	ctx := context.Background()
 	cfg, err := config.New()
 	if err != nil {
 		return err
@@ -39,6 +45,14 @@ func Start() error {
 		return err
 	}
 
+	client, err := genai.NewClient(ctx, &genai.ClientConfig{
+		APIKey:  cfg.GEMINI_API_KEY,
+		Backend: genai.BackendGeminiAPI,
+	})
+	if err != nil {
+		return err
+	}
+
 	r := gin.Default()
 	v1 := r.Group("/api/v1")
 
@@ -53,6 +67,10 @@ func Start() error {
 	productRepo := productrepository.NewProductRepository(database)
 	productUsecase := productusecase.NewProductUsecase(productRepo)
 	productHandler.NewProductHandler(v1, productUsecase)
+
+	aiService := aiService.NewAIService(client)
+	aiUsecase := aiUsecase.NewAiUsecase(aiService)
+	aiHandler.NewAIHandler(v1, aiUsecase)
 
 	v1.GET("/ping", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{
