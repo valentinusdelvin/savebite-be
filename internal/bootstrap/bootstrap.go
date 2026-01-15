@@ -77,7 +77,10 @@ func Start() error {
 			"message": "pong",
 		})
 	})
-	r.Run()
+	err = r.Run()
+	if err != nil {
+		return err
+	}
 
 	return nil
 }
