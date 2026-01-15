@@ -9,12 +9,12 @@ import (
 	"gorm.io/gorm"
 )
 
-type UserHandler struct {
+type userHandler struct {
 	UserUsecase usecase.UserUsecaseItf
 }
 
 func NewUserHandler(routerGroup *gin.RouterGroup, UserUsecase usecase.UserUsecaseItf) {
-	UserHandler := UserHandler{
+	UserHandler := userHandler{
 		UserUsecase: UserUsecase,
 	}
 	user := routerGroup.Group("/users")
@@ -23,7 +23,7 @@ func NewUserHandler(routerGroup *gin.RouterGroup, UserUsecase usecase.UserUsecas
 	user.POST("/login", UserHandler.Login)
 }
 
-func (h *UserHandler) Register(ctx *gin.Context) {
+func (h *userHandler) Register(ctx *gin.Context) {
 	param := dto.Register{}
 
 	err := ctx.ShouldBindJSON(&param)
@@ -53,7 +53,7 @@ func (h *UserHandler) Register(ctx *gin.Context) {
 	}
 }
 
-func (h *UserHandler) Login(ctx *gin.Context) {
+func (h *userHandler) Login(ctx *gin.Context) {
 	param := dto.Login{}
 
 	err := ctx.ShouldBindJSON(&param)

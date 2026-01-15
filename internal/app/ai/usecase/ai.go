@@ -12,15 +12,15 @@ type AiUsecaseItf interface {
 	GenerateRecipe(ctx context.Context, req dto.AIRequest) (dto.Recipe, error)
 }
 
-type AiUsecase struct {
+type aiUsecase struct {
 	aiService service.AIService
 }
 
-func NewAiUsecase(ai service.AIService) *AiUsecase {
-	return &AiUsecase{aiService: ai}
+func NewAiUsecase(aiService service.AIService) AiUsecaseItf {
+	return &aiUsecase{aiService: aiService}
 }
 
-func (a *AiUsecase) GenerateRecipe(ctx context.Context, req dto.AIRequest) (dto.Recipe, error) {
+func (a *aiUsecase) GenerateRecipe(ctx context.Context, req dto.AIRequest) (dto.Recipe, error) {
 	result, err := a.aiService.GenerateRecipe(ctx, req)
 	if err != nil {
 		return dto.Recipe{}, err

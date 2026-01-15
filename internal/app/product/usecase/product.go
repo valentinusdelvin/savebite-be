@@ -13,21 +13,21 @@ type ProductUsecaseItf interface {
 	GetAllProducts() ([]entity.Product, error)
 	GetProductByID(id string) (entity.Product, error)
 }
-type ProductUsecase struct {
+type productUsecase struct {
 	productRepo repository.ProductRepositoryItf
 }
 
 func NewProductUsecase(productRepo repository.ProductRepositoryItf) ProductUsecaseItf {
-	return &ProductUsecase{
+	return &productUsecase{
 		productRepo: productRepo,
 	}
 }
 
-func (u *ProductUsecase) GetProductTest() string {
+func (u *productUsecase) GetProductTest() string {
 	return u.productRepo.GetProductTest()
 }
 
-func (u *ProductUsecase) CreateProduct(param dto.CreateProduct) error {
+func (u *productUsecase) CreateProduct(param dto.CreateProduct) error {
 	product := entity.Product{
 		ProductId:    uuid.New(),
 		Name:         param.Name,
@@ -44,7 +44,7 @@ func (u *ProductUsecase) CreateProduct(param dto.CreateProduct) error {
 	return nil
 }
 
-func (u *ProductUsecase) GetAllProducts() ([]entity.Product, error) {
+func (u *productUsecase) GetAllProducts() ([]entity.Product, error) {
 	products, err := u.productRepo.GetAllProducts()
 	if err != nil {
 		return nil, err
@@ -52,7 +52,7 @@ func (u *ProductUsecase) GetAllProducts() ([]entity.Product, error) {
 	return products, nil
 }
 
-func (u *ProductUsecase) GetProductByID(id string) (entity.Product, error) {
+func (u *productUsecase) GetProductByID(id string) (entity.Product, error) {
 	product, err := u.productRepo.GetProductByID(id)
 	if err != nil {
 		return entity.Product{}, err

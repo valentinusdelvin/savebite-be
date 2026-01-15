@@ -12,21 +12,21 @@ type ProductRepositoryItf interface {
 	GetProductByID(id string) (entity.Product, error)
 }
 
-type ProductRepository struct {
+type productRepository struct {
 	db *gorm.DB
 }
 
 func NewProductRepository(db *gorm.DB) ProductRepositoryItf {
-	return &ProductRepository{
+	return &productRepository{
 		db: db,
 	}
 }
 
-func (r *ProductRepository) GetProductTest() string {
+func (r *productRepository) GetProductTest() string {
 	return "Product Repository Test"
 }
 
-func (r *ProductRepository) CreateProduct(param entity.Product) error {
+func (r *productRepository) CreateProduct(param entity.Product) error {
 	err := r.db.Table("products").Create(&param).Error
 	if err != nil {
 		return err
@@ -34,7 +34,7 @@ func (r *ProductRepository) CreateProduct(param entity.Product) error {
 	return nil
 }
 
-func (r *ProductRepository) GetAllProducts() ([]entity.Product, error) {
+func (r *productRepository) GetAllProducts() ([]entity.Product, error) {
 	var products []entity.Product
 	err := r.db.Table("products").Find(&products).Error
 	if err != nil {
@@ -43,7 +43,7 @@ func (r *ProductRepository) GetAllProducts() ([]entity.Product, error) {
 	return products, nil
 }
 
-func (r *ProductRepository) GetProductByID(id string) (entity.Product, error) {
+func (r *productRepository) GetProductByID(id string) (entity.Product, error) {
 	var product entity.Product
 	err := r.db.Table("products").Where("id = ?", id).First(&product).Error
 	if err != nil {
