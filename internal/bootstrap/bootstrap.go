@@ -10,8 +10,8 @@ import (
 	aiService "github.com/valentinusdelvin/savebite-be/internal/app/ai/service"
 	aiUsecase "github.com/valentinusdelvin/savebite-be/internal/app/ai/usecase"
 	productHandler "github.com/valentinusdelvin/savebite-be/internal/app/product/handler"
-	productrepository "github.com/valentinusdelvin/savebite-be/internal/app/product/repository"
-	productusecase "github.com/valentinusdelvin/savebite-be/internal/app/product/usecase"
+	productRepository "github.com/valentinusdelvin/savebite-be/internal/app/product/repository"
+	productUsecase "github.com/valentinusdelvin/savebite-be/internal/app/product/usecase"
 	userHandler "github.com/valentinusdelvin/savebite-be/internal/app/user/handler"
 	userRepository "github.com/valentinusdelvin/savebite-be/internal/app/user/repository"
 	userUsecase "github.com/valentinusdelvin/savebite-be/internal/app/user/usecase"
@@ -64,8 +64,8 @@ func Start() error {
 
 	v1.Use(middleware.NewMiddleware(jwtItf).Authentication)
 
-	productRepo := productrepository.NewProductRepository(database)
-	productUsecase := productusecase.NewProductUsecase(productRepo)
+	productRepo := productRepository.NewProductRepository(database)
+	productUsecase := productUsecase.NewProductUsecase(productRepo)
 	productHandler.NewProductHandler(v1, productUsecase)
 
 	aiService := aiService.NewAIService(client)
