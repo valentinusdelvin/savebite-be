@@ -9,7 +9,7 @@ import (
 	"google.golang.org/genai"
 )
 
-type AIService interface {
+type AIServiceItf interface {
 	GenerateRecipe(ctx context.Context, req dto.AIRequest) (string, error)
 }
 
@@ -18,7 +18,7 @@ type aiService struct {
 	model  string
 }
 
-func NewAIService(client *genai.Client) AIService {
+func NewAIService(client *genai.Client) AIServiceItf {
 	return &aiService{
 		client: client,
 		model:  "gemini-2.5-flash",
