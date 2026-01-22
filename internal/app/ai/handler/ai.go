@@ -6,6 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/valentinusdelvin/savebite-be/internal/app/ai/usecase"
 	"github.com/valentinusdelvin/savebite-be/internal/domain/dto"
+	"github.com/valentinusdelvin/savebite-be/internal/models"
 )
 
 type AIHandler struct {
@@ -25,28 +26,27 @@ func (h *AIHandler) GenerateRecipe(c *gin.Context) {
 	var req dto.AIRequest
 
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"success": false,
-			"message": "invalid request body",
-			"error":   err.Error(),
+		c.JSON(http.StatusBadRequest, models.JSONErrorResponse{
+			Status:  http.StatusBadRequest,
+			Error:   "bad request",
+			Details: err.Error(),
 		})
 		return
 	}
 
 	result, err := h.aiUsecase.GenerateRecipe(c.Request.Context(), req)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"success": false,
-			"message": "failed to generate recipe",
-			"error":   err.Error(),
+		c.JSON(http.StatusInternalServerError, models.JSONErrorResponse{
+			Status:  http.StatusInternalServerError,
+			Error:   "failed to generate recipe",
+			Details: err.Error(),
 		})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{
-		"success": true,
-		"data": gin.H{
-			"recipe": result,
-		},
+	c.JSON(http.StatusOK, models.JSONSuccessResponse{
+		Status:  http.StatusOK,
+		Message: "recipe generated successfully",
+		Data:    result,
 	})
 }

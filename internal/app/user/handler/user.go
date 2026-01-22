@@ -2,10 +2,12 @@ package handler
 
 import (
 	"errors"
+	"net/http"
 
 	"github.com/gin-gonic/gin"
 	"github.com/valentinusdelvin/savebite-be/internal/app/user/usecase"
 	"github.com/valentinusdelvin/savebite-be/internal/domain/dto"
+	"github.com/valentinusdelvin/savebite-be/internal/models"
 	"gorm.io/gorm"
 )
 
@@ -28,9 +30,10 @@ func (h *userHandler) Register(ctx *gin.Context) {
 
 	err := ctx.ShouldBindJSON(&param)
 	if err != nil {
-		ctx.JSON(400, gin.H{
-			"error":   "Bad Request",
-			"message": err.Error(),
+		ctx.JSON(http.StatusBadRequest, models.JSONErrorResponse{
+			Status:  http.StatusBadRequest,
+			Error:   "Bad Request",
+			Details: err.Error(),
 		})
 		return
 	}
@@ -38,15 +41,17 @@ func (h *userHandler) Register(ctx *gin.Context) {
 	err = h.UserUsecase.Register(param)
 	if err != nil {
 		if errors.Is(err, gorm.ErrDuplicatedKey) {
-			ctx.JSON(409, gin.H{
-				"error":   "Conflict",
-				"message": "Email already exists",
+			ctx.JSON(http.StatusConflict, models.JSONErrorResponse{
+				Status:  http.StatusConflict,
+				Error:   "Conflict",
+				Details: "Email already exists",
 			})
 			return
 		} else {
-			ctx.JSON(500, gin.H{
-				"error":   "Internal Server Error",
-				"message": err.Error(),
+			ctx.JSON(http.StatusInternalServerError, models.JSONErrorResponse{
+				Status:  http.StatusInternalServerError,
+				Error:   "Internal Server Error",
+				Details: err.Error(),
 			})
 			return
 		}
@@ -58,23 +63,27 @@ func (h *userHandler) Login(ctx *gin.Context) {
 
 	err := ctx.ShouldBindJSON(&param)
 	if err != nil {
-		ctx.JSON(400, gin.H{
-			"error":   "Bad Request",
-			"message": err.Error(),
+		ctx.JSON(http.StatusBadRequest, models.JSONErrorResponse{
+			Status:  http.StatusBadRequest,
+			Error:   "Bad Request",
+			Details: err.Error(),
 		})
 		return
 	}
 
 	token, err := h.UserUsecase.Login(param)
 	if err != nil {
-		ctx.JSON(500, gin.H{
-			"error":   "Internal Server Error",
-			"message": err.Error(),
+		ctx.JSON(http.StatusInternalServerError, models.JSONErrorResponse{
+			Status:  http.StatusInternalServerError,
+			Error:   "Internal Server Error",
+			Details: err.Error(),
 		})
 		return
 	}
 
-	ctx.JSON(200, gin.H{
-		"token": token,
+	ctx.JSON(http.StatusOK, models.JSONSuccessResponse{
+		Status:  http.StatusOK,
+		Message: "login successful",
+		Data:    token,
 	})
 }
