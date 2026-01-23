@@ -17,7 +17,7 @@ import (
 	userRepository "github.com/valentinusdelvin/savebite-be/internal/app/user/repository"
 	userUsecase "github.com/valentinusdelvin/savebite-be/internal/app/user/usecase"
 	"github.com/valentinusdelvin/savebite-be/internal/infra/config"
-	"github.com/valentinusdelvin/savebite-be/internal/infra/mysql"
+	postgres "github.com/valentinusdelvin/savebite-be/internal/infra/postgresql"
 	"github.com/valentinusdelvin/savebite-be/internal/middleware"
 	"github.com/valentinusdelvin/savebite-be/internal/models"
 	"github.com/valentinusdelvin/savebite-be/internal/pkg/jwt"
@@ -31,19 +31,20 @@ func Start() error {
 		return err
 	}
 
-	database, err := mysql.New(fmt.Sprintf(
-		"%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local",
+	database, err := postgres.New(fmt.Sprintf(
+		"host=%s user=%s password=%s dbname=%s port=%s sslmode=disable TimeZone=Asia/Jakarta",
+		cfg.DB_HOST,
 		cfg.DB_USERNAME,
 		cfg.DB_PASSWORD,
-		cfg.DB_HOST,
+		cfg.DB_DATABASE,
 		cfg.DB_PORT,
-		cfg.DB_DATABASE))
+	))
 
 	if err != nil {
 		return err
 	}
 
-	if err := mysql.Migrate(database); err != nil {
+	if err := postgres.Migrate(database); err != nil {
 		return err
 	}
 

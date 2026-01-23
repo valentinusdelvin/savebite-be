@@ -1,4 +1,4 @@
-package mysql
+package postgres
 
 import (
 	"github.com/valentinusdelvin/savebite-be/internal/domain/entity"
