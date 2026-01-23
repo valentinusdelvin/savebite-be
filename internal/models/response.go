@@ -9,5 +9,5 @@ type JSONSuccessResponse struct {
 type JSONErrorResponse struct {
 	Status  int    `json:"status"`
 	Error   string `json:"error"`
-	Details string `json:"details,omitempty"`
+	Details any    `json:"details,omitempty"`
 }
