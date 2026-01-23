@@ -42,10 +42,9 @@ func (u *userUsecase) Register(register dto.Register) error {
 		Password:  string(hashedPassword),
 	}
 
-	if strings.Split(register.Email, "@")[1] == "savebite.com" {
+	parts := strings.Split(register.Email, "@")
+	if len(parts) == 2 && parts[1] == "savebite.com" {
 		user.IsAdmin = true
-	} else {
-		user.IsAdmin = false
 	}
 
 	err = u.userRepo.CreateUser(user)
