@@ -1,5 +1,5 @@
 run:
 	@go run cmd/api/main.go
 
-up:
+compose-up:
 	@$(DOCKER_COMPOSE_CMD) up --detach --build
