@@ -1,0 +1,57 @@
+name: savebite-be
+services:
+  mysql:
+    container_name: savebite-mysql
+    image: mysql:latest
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${DB_DATABASE}
+      MYSQL_USER: ${DB_USERNAME}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - "3310:3306"
+    volumes:
+      - mysql:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    networks:
+      - savebite-private
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: savebite-be
+    env_file:
+      - .env
+    image: savebite-be:latest
+    restart: always
+    depends_on:
+      - mysql
+    environment:
+      - APP_ENV=production
+      - APP_PORT=${APP_PORT}
+      - DB_ROOT_PASSWORD=${DB_ROOT_PASSWORD}
+      - DB_CONNECTION=${DB_CONNECTION}
+      - DB_HOST=${DB_HOST}
+      - DB_PORT=${DB_PORT}
+      - DB_DATABASE=${DB_DATABASE}
+      - DB_USERNAME=savebite_user
+      - DB_PASSWORD=${DB_PASSWORD}
+      - JWT_SECRET=${JWT_SECRET}
+      - JWT_EXPIRES=${JWT_EXPIRES}
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+    ports:
+      - "${APP_PORT}:${APP_PORT}"
+    networks:
+      - savebite-private
+
+networks:
+  savebite-private:
+    driver: bridge
+
+volumes:
+  mysql:
