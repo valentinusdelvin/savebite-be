@@ -2,7 +2,7 @@ name: savebite-be
 services:
   mysql:
     container_name: savebite-mysql
-    image: mysql:latest
+    image: mysql:8.0
     restart: always
     environment:
       MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
