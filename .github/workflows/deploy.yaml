@@ -38,4 +38,3 @@ jobs:
       - name: Deploy with Docker Compose
         run: |
           make compose-up
-          make migrate-up
