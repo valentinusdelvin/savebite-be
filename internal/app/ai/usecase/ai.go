@@ -13,10 +13,10 @@ type AiUsecaseItf interface {
 }
 
 type aiUsecase struct {
-	aiService service.AIService
+	aiService service.AIServiceItf
 }
 
-func NewAiUsecase(aiService service.AIService) AiUsecaseItf {
+func NewAiUsecase(aiService service.AIServiceItf) AiUsecaseItf {
 	return &aiUsecase{aiService: aiService}
 }
 
