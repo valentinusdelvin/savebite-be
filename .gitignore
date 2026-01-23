@@ -22,6 +22,7 @@ go.work
 
 # config
 .env
+.secrets
 
 # IDEs and editors
 .vscode/
