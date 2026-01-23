@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/go-playground/validator/v10"
 	"github.com/valentinusdelvin/savebite-be/internal/app/product/usecase"
 	"github.com/valentinusdelvin/savebite-be/internal/domain/dto"
 	"github.com/valentinusdelvin/savebite-be/internal/models"
@@ -12,11 +13,13 @@ import (
 )
 
 type ProductHandler struct {
+	validator      *validator.Validate
 	productUsecase usecase.ProductUsecaseItf
 }
 
-func NewProductHandler(routerGroup *gin.RouterGroup, productUsecase usecase.ProductUsecaseItf) {
+func NewProductHandler(routerGroup *gin.RouterGroup, validator *validator.Validate, productUsecase usecase.ProductUsecaseItf) {
 	ProductHandler := ProductHandler{
+		validator:      validator,
 		productUsecase: productUsecase,
 	}
 	product := routerGroup.Group("/products")

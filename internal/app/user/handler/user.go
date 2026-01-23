@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/go-playground/validator/v10"
 	"github.com/valentinusdelvin/savebite-be/internal/app/user/usecase"
 	"github.com/valentinusdelvin/savebite-be/internal/domain/dto"
 	"github.com/valentinusdelvin/savebite-be/internal/models"
@@ -12,11 +13,13 @@ import (
 )
 
 type userHandler struct {
+	validator   *validator.Validate
 	UserUsecase usecase.UserUsecaseItf
 }
 
-func NewUserHandler(routerGroup *gin.RouterGroup, UserUsecase usecase.UserUsecaseItf) {
+func NewUserHandler(routerGroup *gin.RouterGroup, validator *validator.Validate, UserUsecase usecase.UserUsecaseItf) {
 	UserHandler := userHandler{
+		validator:   validator,
 		UserUsecase: UserUsecase,
 	}
 	user := routerGroup.Group("/users")
@@ -29,6 +32,16 @@ func (h *userHandler) Register(ctx *gin.Context) {
 	param := dto.Register{}
 
 	err := ctx.ShouldBindJSON(&param)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, models.JSONErrorResponse{
+			Status:  http.StatusBadRequest,
+			Error:   "Bad Request",
+			Details: err.Error(),
+		})
+		return
+	}
+
+	err = h.validator.Struct(param)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, models.JSONErrorResponse{
 			Status:  http.StatusBadRequest,

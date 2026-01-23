@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/go-playground/validator/v10"
 	aiHandler "github.com/valentinusdelvin/savebite-be/internal/app/ai/handler"
 	aiService "github.com/valentinusdelvin/savebite-be/internal/app/ai/service"
 	aiUsecase "github.com/valentinusdelvin/savebite-be/internal/app/ai/usecase"
@@ -18,6 +19,7 @@ import (
 	"github.com/valentinusdelvin/savebite-be/internal/infra/config"
 	"github.com/valentinusdelvin/savebite-be/internal/infra/mysql"
 	"github.com/valentinusdelvin/savebite-be/internal/middleware"
+	"github.com/valentinusdelvin/savebite-be/internal/models"
 	"github.com/valentinusdelvin/savebite-be/internal/pkg/jwt"
 	"google.golang.org/genai"
 )
@@ -53,30 +55,35 @@ func Start() error {
 		return err
 	}
 
+	validator := validator.New()
+
 	r := gin.Default()
 	v1 := r.Group("/api/v1")
+
+	v1.GET("/ping", func(c *gin.Context) {
+		c.JSON(http.StatusOK, models.JSONSuccessResponse{
+			Status:  http.StatusOK,
+			Message: "pong",
+			Data:    "pong",
+		})
+	})
 
 	jwtItf := jwt.NewJWT(cfg.JWT_SECRET, cfg.JWT_EXPIRES)
 
 	userRepo := userRepository.NewUserRepository(database)
 	userUsecase := userUsecase.NewUserUsecase(userRepo, jwtItf)
-	userHandler.NewUserHandler(v1, userUsecase)
+	userHandler.NewUserHandler(v1, validator, userUsecase)
 
 	v1.Use(middleware.NewMiddleware(jwtItf).Authentication)
 
 	productRepo := productRepository.NewProductRepository(database)
 	productUsecase := productUsecase.NewProductUsecase(productRepo)
-	productHandler.NewProductHandler(v1, productUsecase)
+	productHandler.NewProductHandler(v1, validator, productUsecase)
 
 	aiService := aiService.NewAIService(client)
 	aiUsecase := aiUsecase.NewAiUsecase(aiService)
 	aiHandler.NewAIHandler(v1, aiUsecase)
 
-	v1.GET("/ping", func(c *gin.Context) {
-		c.JSON(http.StatusOK, gin.H{
-			"message": "pong",
-		})
-	})
 	err = r.Run()
 	if err != nil {
 		return err
